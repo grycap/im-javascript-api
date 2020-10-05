@@ -1,0 +1,87 @@
+<html>
+
+<body>
+<script src="im.js"></script>
+</body>
+<script>
+    var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user",
+                                                                    "password": "pass"})
+    var oneAuth = new IMAuthDataItem("one", "OpenNebula", {"host": "somehost.com:2633",
+                                                           "username": "user",
+                                                           "password": "pass"})
+
+    var authData = new IMAuthData([imAuth, oneAuth])
+    var im = new IMClient("https://appsgrycap.i3m.upv.es:31443/im-dev", authData);
+
+    im.getVersion().then(
+        version => console.log(version)
+    );
+
+    im.getInfrastructureList().then(
+        response => {
+            if (response.ok) {
+                response.data['uri-list'].forEach(infID => {
+                    console.log(infID['uri'])
+                });
+            } else {
+                console.log(response.data['message'])
+            }
+        }
+    );
+
+    radl = "network publica (outbound = 'yes')\n" +
+           "system node (\n" + 
+           "cpu.count>=1 and\n" +
+           "memory.size>=512m and\n" + 
+           "net_interface.0.connection = 'publica' and\n" + 
+           "net_interface.0.dns_name = 'testnode' and\n" + 
+           "disk.0.os.name='linux' and\n" + 
+           "disk.0.os.flavour='ubuntu' and\n" + 
+           "disk.0.os.version>='20.04'\n" + 
+           ")\n" + 
+           "deploy node 1";
+    im.createInfrastructure(radl).then(
+        response => {
+            if (response.ok) {
+                console.log(response.data['uri'])
+            } else {
+                console.log(response.data['message'])
+            }
+        }
+    )
+
+    im.getInfrastructureInfo('04403282-fe71-11ea-896b-82d83c314838').then(
+        response => {
+            if (response.ok) {
+                response.data['uri-list'].forEach(vmID => {
+                    console.log(vmID['uri'])
+                });
+            } else {
+                console.log(response.data['message'])
+            }
+        }
+    );
+
+    im.getVMInfo('04403282-fe71-11ea-896b-82d83c314838', '0').then(
+        response => {
+            if (response.ok) {
+                console.log(response.data['radl'])
+            } else {
+                console.log(response.data['message'])
+            }
+        }
+    );
+
+    im.destroyInfrastructure('9af7d806-f0ed-11ea-82d0-f079596e599b').then(
+        response => {
+            if (response.ok) {
+                console.log("Successfully deleted")
+            } else {
+                console.log(response.data['message'])
+            }
+        }
+    );
+
+
+</script>
+</html>
