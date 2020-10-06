@@ -114,6 +114,22 @@ class IMVirtualMachine {
   async getVMContMsg(infID, vmID) {
     return this.getVMProperty(infID, vmID, "contmsg")
   }
+
+  async destroy() {
+    const headers = {'Accept': 'application/json',
+                     'Authorization': this.client.authData.formatAuthData()};
+    const response = await fetch(this.fullid, {
+      method: 'DELETE',
+      headers: headers
+    })
+    if (response.ok) {
+      const output = await response.text();
+      return new IMResponse(response.ok, output, null);
+    } else {
+      const output = await response.json();
+      return new IMResponse(response.ok, null, output['message']);
+    }
+  }
 }
 
 
@@ -158,7 +174,7 @@ class IMInfrastructure {
     })
     if (response.ok) {
       const output = await response.text();
-      return new IMResponse(response.ok, await output, null);
+      return new IMResponse(response.ok, output, null);
     } else {
       const output = await response.json();
       return new IMResponse(response.ok, null, output['message']);
@@ -172,7 +188,7 @@ class IMInfrastructure {
     const response = await fetch(url, {headers: headers});
     const output = await response.json();
     if (response.ok) {
-      return new IMResponse(response.ok, await output, null);
+      return new IMResponse(response.ok, output, null);
     } else {
       return new IMResponse(response.ok, null, output['message']);
     }
@@ -194,7 +210,7 @@ class IMInfrastructure {
           }
         });
       }
-      return new IMResponse(response.ok, await output, null);
+      return new IMResponse(response.ok, output, null);
     } else {
       return new IMResponse(response.ok, null, output['message']);
     }
@@ -203,6 +219,8 @@ class IMInfrastructure {
   async getContMsg(infID) {
     return this.getProperty(infID, "contmsg")
   }
+
+
 }
 
 

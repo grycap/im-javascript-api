@@ -33,8 +33,8 @@ Error Message
 <textarea name="log" id="log" cols="120" rows="15">
 </textarea>
 <script>
-    var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user",
-                                                                    "password": "pass"})
+    var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "micafer",
+                                                                    "password": "grycap01"})
     var oneAuth = new IMAuthDataItem("one", "OpenNebula", {"host": "somehost.com:2633",
                                                            "username": "user",
                                                            "password": "pass"})
@@ -135,6 +135,22 @@ Error Message
                 log.value = log.value + "Error Getting VM Info";
                 log.value = log.value + "\n------------------------------------\n";
                 log.value = log.value + response.data['message'];
+                log.value = log.value + "\n------------------------------------\n\n";
+            }
+        }
+    );
+
+    vm.destroy().then(
+        response => {
+            if (response.ok) {
+                log.value = log.value + "Delete VM.";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + "Successfully deleted";
+                log.value = log.value + "\n------------------------------------\n\n";
+            } else {
+                log.value = log.value + "Error Deleting VM.";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.message;
                 log.value = log.value + "\n------------------------------------\n\n";
             }
         }
