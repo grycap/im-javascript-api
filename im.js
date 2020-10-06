@@ -78,22 +78,6 @@ class IMCloudResource {
     this.id = null;
   }
 
-  async getInfo() {
-    const headers = {'Accept': 'application/json',
-                    'Authorization': this.client.authData.formatAuthData()};
-    const response = await fetch(this.fullid, {headers: headers});
-    const output = await response.json();
-    if (response.ok) {
-      this.vms = [];
-      output['uri-list'].forEach(vmID => {
-        this.vms.push(new IMVirtualMachine(this.client, vmID['uri']));
-      });
-      return new IMResponse(true, this.vms, null);
-    } else {
-      return new IMResponse(false, null, output['message']);
-    }
-  }
-
   async destroy() {
     const headers = {'Accept': 'application/json',
                      'Authorization': this.client.authData.formatAuthData()};
@@ -173,8 +157,37 @@ class IMVirtualMachine extends IMCloudResource {
     }
   }
 
+  async getInfo() {
+    const headers = {'Accept': 'application/json',
+                    'Authorization': this.client.authData.formatAuthData()};
+    const response = await fetch(this.fullid, {headers: headers});
+    const output = await response.json();
+    if (response.ok) {
+      this.radl = output['radl'];
+      return new IMResponse(true, this.radl, null);
+    } else {
+      return new IMResponse(false, null, output['message']);
+    }
+  }
+
   async reboot() {
     return this.performOperation("reboot");
+  }
+
+  async createDiskSnapshot(diskNum, imageName, autoDelete='false') {
+    const headers = {'Authorization': this.client.authData.formatAuthData()};
+    const url = this.fullid + "/disks/" + diskNum + "/snapshot?image_name=" + imageName + "&auto_delete=" + autoDelete;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: headers
+    })
+    if (response.ok) {
+      const output = await response.text();
+      return new IMResponse(true, output, null);
+    } else {
+      const output = await response.json();
+      return new IMResponse(false, null, output['message']);
+    }
   }
 
 }
@@ -193,6 +206,22 @@ class IMInfrastructure extends IMCloudResource {
     } else {
       this.id = id;
       this.fullid = this.client.imUrl + '/infrastructures/' + this.id;
+    }
+  }
+
+  async getInfo() {
+    const headers = {'Accept': 'application/json',
+                    'Authorization': this.client.authData.formatAuthData()};
+    const response = await fetch(this.fullid, {headers: headers});
+    const output = await response.json();
+    if (response.ok) {
+      this.vms = [];
+      output['uri-list'].forEach(vmID => {
+        this.vms.push(new IMVirtualMachine(this.client, vmID['uri']));
+      });
+      return new IMResponse(true, this.vms, null);
+    } else {
+      return new IMResponse(false, null, output['message']);
     }
   }
 
@@ -250,7 +279,7 @@ class IMInfrastructure extends IMCloudResource {
     }
   }
 
-  async reconfigure(template, type="radl") {
+  async reconfigure(template, type="radl", vmList="") {
     var contentType = "text/plain"
     if (type == "json") {
       contentType = "application/json";
@@ -260,7 +289,10 @@ class IMInfrastructure extends IMCloudResource {
     const headers = {'Accept': 'application/json',
                       'Authorization': this.client.authData.formatAuthData(),
                       'Content-Type': contentType};
-    const url = this.fullid;
+    var url = this.fullid;
+    if (vmList != "") {
+      url = url + "?vm_list=" + vmList;
+    }
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
