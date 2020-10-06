@@ -3,6 +3,35 @@
 <body>
 <script src="im.js"></script>
 </body>
+<h2>
+Template
+</h2>
+<textarea name="template" id="template" cols="60" rows="15">
+network publica (outbound = 'yes')
+system node (
+cpu.count>=1 and
+memory.size>=512m and
+net_interface.0.connection = 'publica' and
+net_interface.0.dns_name = 'testnode' and
+disk.0.os.name='linux' and
+disk.0.os.flavour='ubuntu' and
+disk.0.os.version>='20.04'
+)
+deploy node 1
+</textarea>
+
+<br/><br/>
+<h2>
+Inf ID
+</h2>
+<textarea name="infid" id="infid" cols="100" rows="3">
+</textarea>
+<br/><br/>
+<h2>
+Error Message
+</h2>
+<textarea name="log" id="log" cols="120" rows="15">
+</textarea>
 <script>
     var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user",
                                                                     "password": "pass"})
@@ -13,6 +42,9 @@
     var authData = new IMAuthData([imAuth, oneAuth])
     var im = new IMClient("https://appsgrycap.i3m.upv.es:31443/im-dev", authData);
 
+    var log = document.getElementById('log');
+    var infid = document.getElementById('infid');
+
     im.getVersion().then(
         version => console.log(version)
     );
@@ -20,68 +52,108 @@
     im.getInfrastructureList().then(
         response => {
             if (response.ok) {
-                response.data['uri-list'].forEach(infID => {
-                    console.log(infID['uri'])
+                log.value = log.value + "Inf. list";
+                log.value = log.value + "\n------------------------------------\n";
+                response.data.forEach(inf => {
+                    log.value = log.value + inf.id + "\n";
                 });
+                log.value = log.value + "\n------------------------------------\n";
             } else {
-                console.log(response.data['message'])
+                log.value = log.value + "Error Getting Inf. list";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.message;
+                log.value = log.value + "\n------------------------------------\n";
             }
         }
     );
 
-    radl = "network publica (outbound = 'yes')\n" +
-           "system node (\n" + 
-           "cpu.count>=1 and\n" +
-           "memory.size>=512m and\n" + 
-           "net_interface.0.connection = 'publica' and\n" + 
-           "net_interface.0.dns_name = 'testnode' and\n" + 
-           "disk.0.os.name='linux' and\n" + 
-           "disk.0.os.flavour='ubuntu' and\n" + 
-           "disk.0.os.version>='20.04'\n" + 
-           ")\n" + 
-           "deploy node 1";
+    //var inf = new IMInfrastructure(im, 'https://appsgrycap.i3m.upv.es:31443/im-dev/infrastructures/04403282-fe71-11ea-896b-82d83c314838');
+    var inf = new IMInfrastructure(im, '04403282-fe71-11ea-896b-82d83c314838');
+    inf.getInfo().then(
+        response => {
+            if (response.ok) {
+                log.value = log.value + "Inf. Info";
+                log.value = log.value + "\n------------------------------------\n";
+                response.data.forEach(vm => {
+                    log.value = log.value + vm.id + "\n";
+                });
+                log.value = log.value + "\n------------------------------------\n";
+            } else {
+                log.value = log.value + "Error Getting Inf. Info";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.data['message'];
+                log.value = log.value + "\n------------------------------------\n\n";
+            }
+        }
+    );
+
+    inf.destroy().then(
+        response => {
+            if (response.ok) {
+                log.value = log.value + "Delete Inf.";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + "Successfully deleted";
+                log.value = log.value + "\n------------------------------------\n\n";
+            } else {
+                log.value = log.value + "Error Deleting Inf.";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.message;
+                log.value = log.value + "\n------------------------------------\n\n";
+            }
+        }
+    );
+
+    inf.getState().then(
+        response => {
+            if (response.ok) {
+                log.value = log.value + "Get Inf. State";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + inf.state + "\n";
+                inf.vms.forEach(vm => {
+                    log.value = log.value + vm.id + ": " + vm.state + "\n";
+                })
+                log.value = log.value + "\n------------------------------------\n\n";
+            } else {
+                log.value = log.value + "Error Getting Inf. State";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.message;
+                log.value = log.value + "\n------------------------------------\n\n";
+            }
+        }
+    );
+
+    //var vm = new IMVirtualMachine(im, 'https://appsgrycap.i3m.upv.es:31443/im-dev/infrastructures/04403282-fe71-11ea-896b-82d83c314838/vms/0');
+    var vm = new IMVirtualMachine(im, '04403282-fe71-11ea-896b-82d83c314838', '0');
+    vm.getInfo().then(
+        response => {
+            if (response.ok) {
+                log.value = log.value + "VM Info";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + JSON.stringify(response.data);
+                log.value = log.value + "\n------------------------------------\n\n";
+            } else {
+                log.value = log.value + "Error Getting VM Info";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.data['message'];
+                log.value = log.value + "\n------------------------------------\n\n";
+            }
+        }
+    );
+
+    radl = document.getElementById('template').value
     im.createInfrastructure(radl).then(
         response => {
             if (response.ok) {
-                console.log(response.data['uri'])
+                inf = response.data;
+                infid.value = inf.id;
             } else {
-                console.log(response.data['message'])
+                log.value = log.value + "Error Creating Inf.";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.message;
+                log.value = log.value + "\n------------------------------------\n\n";
             }
         }
     )
-
-    im.getInfrastructureInfo('04403282-fe71-11ea-896b-82d83c314838').then(
-        response => {
-            if (response.ok) {
-                response.data['uri-list'].forEach(vmID => {
-                    console.log(vmID['uri'])
-                });
-            } else {
-                console.log(response.data['message'])
-            }
-        }
-    );
-
-    im.getVMInfo('04403282-fe71-11ea-896b-82d83c314838', '0').then(
-        response => {
-            if (response.ok) {
-                console.log(response.data['radl'])
-            } else {
-                console.log(response.data['message'])
-            }
-        }
-    );
-
-    im.destroyInfrastructure('9af7d806-f0ed-11ea-82d0-f079596e599b').then(
-        response => {
-            if (response.ok) {
-                console.log("Successfully deleted")
-            } else {
-                console.log(response.data['message'])
-            }
-        }
-    );
-
 
 </script>
 </html>
