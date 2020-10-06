@@ -220,7 +220,62 @@ class IMInfrastructure {
     return this.getProperty(infID, "contmsg")
   }
 
+  async addResource(template, type="radl") {
+    var contentType = "text/plain"
+    if (type == "tosca" || type == "yaml") {
+      contentType = "text/yaml";
+    } else if (type == "json") {
+      contentType = "application/json";
+    } else if (type != "radl") {
+      throw "Invalid type. Only radl, json, tosca or yaml are accepted.";
+    }
+    const headers = {'Accept': 'application/json',
+                      'Authorization': this.client.authData.formatAuthData(),
+                      'Content-Type': contentType};
+    const url = this.fullid;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: template
+    })
+    const output = await response.json();
+    if (response.ok) {
+      newVMs = []
+      output['uri-list'].forEach(vmID => {
+        var vm = new IMVirtualMachine(this.client, vmID['uri']);
+        newVMs.push(vm);
+        this.vms.push(vm);
+      });
+      return new IMResponse(true, newVMs, null);
+    } else {
+      return new IMResponse(false, null, output['message']);
+    }
+  }
 
+  async reconfigure(template, type="radl") {
+    var contentType = "text/plain"
+  if (type == "json") {
+      contentType = "application/json";
+    } else if (type != "radl") {
+      throw "Invalid type. Only radl, json are accepted.";
+    }
+    const headers = {'Accept': 'application/json',
+                      'Authorization': this.client.authData.formatAuthData(),
+                      'Content-Type': contentType};
+    const url = this.fullid;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: template
+    })
+    if (response.ok) {
+      const output = await response.text();
+      return new IMResponse(true, output, null);
+    } else {
+      const output = await response.json();
+      return new IMResponse(false, null, output['message']);
+    }
+  }
 }
 
 

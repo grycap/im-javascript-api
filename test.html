@@ -122,6 +122,41 @@ Error Message
         }
     );
 
+    addradl = "network publica\nsystem node\ndeploy node 1";
+    inf.addResource(addradl).then(
+        response => {
+            if (response.ok) {
+                log.value = log.value + "Added VMs";
+                log.value = log.value + "\n------------------------------------\n";
+                response.data.forEach(vm => {
+                    log.value = log.value + vm.id + "\n";
+                })
+                log.value = log.value + "\n------------------------------------\n\n";
+            } else {
+                log.value = log.value + "Error Adding VMs";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.message;
+                log.value = log.value + "\n------------------------------------\n\n";
+            }
+        }
+    );
+
+    inf.reconfigure("").then(
+        response => {
+            if (response.ok) {
+                log.value = log.value + "Reconfigured Inf.";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + "Successfully reconfigured";
+                log.value = log.value + "\n------------------------------------\n\n";
+            } else {
+                log.value = log.value + "Error Reconfiguring Inf.";
+                log.value = log.value + "\n------------------------------------\n";
+                log.value = log.value + response.message;
+                log.value = log.value + "\n------------------------------------\n\n";
+            }
+        }
+    );
+
     //var vm = new IMVirtualMachine(im, 'https://appsgrycap.i3m.upv.es:31443/im-dev/infrastructures/04403282-fe71-11ea-896b-82d83c314838/vms/0');
     var vm = new IMVirtualMachine(im, '04403282-fe71-11ea-896b-82d83c314838', '0');
     vm.getInfo().then(
