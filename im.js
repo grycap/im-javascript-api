@@ -70,83 +70,12 @@ class IMAuthData {
 }
 
 
-class IMVirtualMachine {
+class IMCloudResource {
 
-  constructor(client, infid, id) {
+  constructor(client) {
     this.client = client;
-    this.radl = null;
-    this.state = null;
-
-    if (id===undefined) {
-      // infid in this case is the full id of the VM
-      this.fullid = infid;
-      this.id = infid.substring(infid.lastIndexOf('/') + 1);
-      var infidFull = infid.substring(0, infid.lastIndexOf('/') - 4);
-      this.infid = infidFull.substring(infidFull.lastIndexOf('/') + 1);
-    } else {
-      this.infid = infid;
-      this.id = id;
-      this.fullid = this.client.imUrl + '/infrastructures/' + this.infid + "/vms/" + this.id;
-    }
-  }
-
-  async getInfo() {
-    const headers = {'Accept': 'application/json',
-                    'Authorization': this.client.authData.formatAuthData()};
-    const response = await fetch(this.fullid, {headers: headers});
-    const output = await response.json();
-    if (response.ok) {
-      this.radl = output['radl'];
-      return new IMResponse(true, this.radl, null);
-    } else {
-      return new IMResponse(false, null, output['message']);
-    }
-  }
-
-  async getProperty(infID, vmID, property) {
-    const headers = {'Accept': 'application/json',
-                    'Authorization': this.authData.formatAuthData()};
-    const url = this.fullid + "/" + property;
-    const response = await fetch(url, {headers: headers});
-    return new IMResponse(response.ok, await response.json());
-  }
-
-  async getVMContMsg(infID, vmID) {
-    return this.getVMProperty(infID, vmID, "contmsg")
-  }
-
-  async destroy() {
-    const headers = {'Accept': 'application/json',
-                     'Authorization': this.client.authData.formatAuthData()};
-    const response = await fetch(this.fullid, {
-      method: 'DELETE',
-      headers: headers
-    })
-    if (response.ok) {
-      const output = await response.text();
-      return new IMResponse(response.ok, output, null);
-    } else {
-      const output = await response.json();
-      return new IMResponse(response.ok, null, output['message']);
-    }
-  }
-}
-
-
-class IMInfrastructure {
-
-  constructor(client, id) {
-    this.client = client;
-    this.vms = [];
-    this.state = null;
-
-    if (id.startsWith('https://') || id.startsWith('http://')) {
-      this.fullid = id;
-      this.id = id.substring(id.lastIndexOf('/') + 1); 
-    } else {
-      this.id = id;
-      this.fullid = this.client.imUrl + '/infrastructures/' + this.id;
-    }
+    this.fullid = null;
+    this.id = null;
   }
 
   async getInfo() {
@@ -181,7 +110,7 @@ class IMInfrastructure {
     }
   }
 
-  async getProperty(infID, property) {
+  async getProperty(property) {
     const headers = {'Accept': 'application/json',
                     'Authorization': this.client.authData.formatAuthData()};
     const url = this.fullid + "/" + property;
@@ -194,7 +123,80 @@ class IMInfrastructure {
     }
   }
 
-  async getState(infID) {
+  async getContMsg() {
+    return this.getProperty("contmsg")
+  }
+
+  async performOperation(operation) {
+    const headers = {'Authorization': this.client.authData.formatAuthData()};
+    const url = this.fullid + "/" + operation;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: headers
+    })
+    if (response.ok) {
+      const output = await response.text();
+      return new IMResponse(true, output, null);
+    } else {
+      const output = await response.json();
+      return new IMResponse(false, null, output['message']);
+    }
+  }
+
+  async start() {
+    return this.performOperation("start");
+  }
+
+  async stop() {
+    return this.performOperation("stop");
+  }
+}
+
+
+class IMVirtualMachine extends IMCloudResource {
+
+  constructor(client, infid, id) {
+    super(client);
+    this.radl = null;
+    this.state = null;
+
+    if (id===undefined) {
+      // infid in this case is the full id of the VM
+      this.fullid = infid;
+      this.id = infid.substring(infid.lastIndexOf('/') + 1);
+      var infidFull = infid.substring(0, infid.lastIndexOf('/') - 4);
+      this.infid = infidFull.substring(infidFull.lastIndexOf('/') + 1);
+    } else {
+      this.infid = infid;
+      this.id = id;
+      this.fullid = this.client.imUrl + '/infrastructures/' + this.infid + "/vms/" + this.id;
+    }
+  }
+
+  async reboot() {
+    return this.performOperation("reboot");
+  }
+
+}
+
+
+class IMInfrastructure extends IMCloudResource {
+
+  constructor(client, id) {
+    super(client);
+    this.vms = [];
+    this.state = null;
+
+    if (id.startsWith('https://') || id.startsWith('http://')) {
+      this.fullid = id;
+      this.id = id.substring(id.lastIndexOf('/') + 1); 
+    } else {
+      this.id = id;
+      this.fullid = this.client.imUrl + '/infrastructures/' + this.id;
+    }
+  }
+
+  async getState() {
     const headers = {'Accept': 'application/json',
                     'Authorization': this.client.authData.formatAuthData()};
     const url = this.fullid + "/state";
@@ -214,10 +216,6 @@ class IMInfrastructure {
     } else {
       return new IMResponse(response.ok, null, output['message']);
     }
-  }
-
-  async getContMsg(infID) {
-    return this.getProperty(infID, "contmsg")
   }
 
   async addResource(template, type="radl") {
@@ -254,7 +252,7 @@ class IMInfrastructure {
 
   async reconfigure(template, type="radl") {
     var contentType = "text/plain"
-  if (type == "json") {
+    if (type == "json") {
       contentType = "application/json";
     } else if (type != "radl") {
       throw "Invalid type. Only radl, json are accepted.";
@@ -276,6 +274,7 @@ class IMInfrastructure {
       return new IMResponse(false, null, output['message']);
     }
   }
+
 }
 
 
