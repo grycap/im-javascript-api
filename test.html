@@ -3,6 +3,9 @@
 <body>
 <script src="im.js"></script>
 </body>
+<input type="button" name="launch" value="Launch Test" onclick="launchTest()"/>
+<input type="text" name="out" id="out" value="" disabled/>
+<br/>
 <h2>
 Template
 </h2>
@@ -34,6 +37,9 @@ Outputs
 <textarea name="log" id="log" cols="120" rows="15">
 </textarea>
 <script>
+function launchTest() {
+    document.getElementById('out').value = "Running";
+
     var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user",
                                                                     "password": "pass"})
     var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
@@ -165,6 +171,8 @@ Outputs
                                                                 log.value = log.value + response.message;
                                                                 log.value = log.value + "\n------------------------------------\n\n";
                                                             }
+
+                                                            document.getElementById('out').value = "Finished";
                                                         }
                                                     );
 
@@ -210,6 +218,8 @@ Outputs
     )
 
 
+
+}
 
 
 
