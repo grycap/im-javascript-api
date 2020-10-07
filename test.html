@@ -117,6 +117,23 @@ function launchTest() {
                                                     }
                                                 }
                                             );
+
+
+                                            vm.reboot().then(
+                                                response => {
+                                                    if (response.ok) {
+                                                        log.value = log.value + "VM reboot";
+                                                        log.value = log.value + "\n------------------------------------\n";
+                                                        log.value = log.value + "Sucess\n";
+                                                        log.value = log.value + "\n------------------------------------\n\n";
+                                                    } else {
+                                                        log.value = log.value + "Error rebooting VM";
+                                                        log.value = log.value + "\n------------------------------------\n";
+                                                        log.value = log.value + response.message;
+                                                        log.value = log.value + "\n------------------------------------\n\n";
+                                                    }
+                                                }
+                                            );
                                         
                                         });
                                         log.value = log.value + "\n------------------------------------\n";
@@ -127,7 +144,62 @@ function launchTest() {
                                         log.value = log.value + "\n------------------------------------\n\n";
                                     }
 
-                        
+                                    inf.getState().then(
+                                        response => {
+                                            if (response.ok) {
+                                                log.value = log.value + "Get Inf. State";
+                                                log.value = log.value + "\n------------------------------------\n";
+                                                log.value = log.value + inf.state + "\n";
+                                                inf.vms.forEach(vm => {
+                                                    log.value = log.value + vm.id + ": " + vm.state + "\n";
+                                                })
+                                                log.value = log.value + "\n------------------------------------\n\n";
+                                            } else {
+                                                log.value = log.value + "Error Getting Inf. State";
+                                                log.value = log.value + "\n------------------------------------\n";
+                                                log.value = log.value + response.message;
+                                                log.value = log.value + "\n------------------------------------\n\n";
+                                            }
+                                        }
+                                    );
+
+                                    inf.start().then(
+                                        response => {
+                                            if (response.ok) {
+                                                log.value = log.value + "Start Inf";
+                                                log.value = log.value + "\n------------------------------------\n";
+                                                log.value = log.value + "Started!\n";
+                                                log.value = log.value + "\n------------------------------------\n\n";
+                                            } else {
+                                                log.value = log.value + "Error starting Inf.";
+                                                log.value = log.value + "\n------------------------------------\n";
+                                                log.value = log.value + response.message;
+                                                log.value = log.value + "\n------------------------------------\n\n";
+                                            }
+                                        }
+                                    );
+
+                                    inf.getContMsg().then(
+                                        response => {
+                                            if (response.ok) {
+                                                log.value = log.value + "Get Inf. Cont Msf";
+                                                log.value = log.value + "\n------------------------------------\n";
+                                                log.value = log.value + response.data;
+                                                log.value = log.value + "\n------------------------------------\n\n";
+                                            } else {
+                                                log.value = log.value + "Error geting Infcont msg.";
+                                                log.value = log.value + "\n------------------------------------\n";
+                                                log.value = log.value + response.message;
+                                                log.value = log.value + "\n------------------------------------\n\n";
+                                            }
+
+                                            document.getElementById('out').value = "Finished";
+                                        }
+                                    );
+
+
+
+
                                     inf.vms[1].destroy().then(
                                         response => {
                                             if (response.ok) {
