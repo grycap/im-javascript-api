@@ -78,10 +78,10 @@ class IMCloudResource {
     this.id = null;
   }
 
-  async destroy() {
+  async destroy(extraParams="") {
     const headers = {'Accept': 'application/json',
                      'Authorization': this.client.authData.formatAuthData()};
-    const response = await fetch(this.fullid, {
+    const response = await fetch(this.fullid + extraParams, {
       method: 'DELETE',
       headers: headers
     })
@@ -94,14 +94,26 @@ class IMCloudResource {
     }
   }
 
-  async getProperty(property) {
+  async getInfo() {
     const headers = {'Accept': 'application/json',
                     'Authorization': this.client.authData.formatAuthData()};
-    const url = this.fullid + "/" + property;
+    const response = await fetch(this.fullid, {headers: headers});
+    const output = await response.json();
+    if (response.ok) {
+      return new IMResponse(true, this.extractInfo(output), null);
+    } else {
+      return new IMResponse(false, null, output['message']);
+    }
+  }
+
+  async getProperty(property, extraParams="") {
+    const headers = {'Accept': 'application/json',
+                    'Authorization': this.client.authData.formatAuthData()};
+    const url = this.fullid + "/" + property + extraParams;
     const response = await fetch(url, {headers: headers});
     const output = await response.json();
     if (response.ok) {
-      return new IMResponse(response.ok, output, null);
+      return new IMResponse(response.ok, output[prop], null);
     } else {
       return new IMResponse(response.ok, null, output['message']);
     }
@@ -157,17 +169,17 @@ class IMVirtualMachine extends IMCloudResource {
     }
   }
 
-  async getInfo() {
-    const headers = {'Accept': 'application/json',
-                    'Authorization': this.client.authData.formatAuthData()};
-    const response = await fetch(this.fullid, {headers: headers});
-    const output = await response.json();
-    if (response.ok) {
-      this.radl = output['radl'];
-      return new IMResponse(true, this.radl, null);
-    } else {
-      return new IMResponse(false, null, output['message']);
+  async destroy(context=true) {
+    var extraParams = "";
+    if (!context) {
+      extraParams = extraParams + "?context=false";
     }
+    return super.destroy(extraParams)
+  }
+
+  extractInfo(data) {
+    this.radl = data['radl'];
+    return this.radl;
   }
 
   async reboot() {
@@ -190,6 +202,32 @@ class IMVirtualMachine extends IMCloudResource {
     }
   }
 
+  async alter(template, type="radl") {
+    var contentType = "text/plain"
+    if (type == "tosca" || type == "yaml") {
+      contentType = "text/yaml";
+    } else if (type == "json") {
+      contentType = "application/json";
+    } else if (type != "radl") {
+      throw "Invalid type. Only radl, json, tosca or yaml are accepted.";
+    }
+    const headers = {'Accept': 'application/json',
+                      'Authorization': this.client.authData.formatAuthData(),
+                      'Content-Type': contentType};
+    const url = this.fullid;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: headers,
+      body: template
+    })
+    const output = await response.json();
+    if (response.ok) {
+      this.radl = output['radl'];
+      return new IMResponse(true, output['radl'], null);
+    } else {
+      return new IMResponse(false, null, output['message']);
+    }
+  }
 }
 
 
@@ -209,20 +247,12 @@ class IMInfrastructure extends IMCloudResource {
     }
   }
 
-  async getInfo() {
-    const headers = {'Accept': 'application/json',
-                    'Authorization': this.client.authData.formatAuthData()};
-    const response = await fetch(this.fullid, {headers: headers});
-    const output = await response.json();
-    if (response.ok) {
-      this.vms = [];
-      output['uri-list'].forEach(vmID => {
-        this.vms.push(new IMVirtualMachine(this.client, vmID['uri']));
-      });
-      return new IMResponse(true, this.vms, null);
-    } else {
-      return new IMResponse(false, null, output['message']);
-    }
+  extractInfo(data) {
+    this.vms = [];
+    data['uri-list'].forEach(vmID => {
+      this.vms.push(new IMVirtualMachine(this.client, vmID['uri']));
+    });
+    return this.vms;
   }
 
   async getState() {
@@ -247,7 +277,23 @@ class IMInfrastructure extends IMCloudResource {
     }
   }
 
-  async addResource(template, type="radl") {
+  async destroy(async=false, force=false) {
+    var extraParams = "";
+    if (async) {
+      extraParams = extraParams + "?async=true";
+    }
+    if (force) {
+      if (async) {
+        extraParams = extraParams + "&";
+      } else {
+        extraParams = extraParams + "?";
+      }
+      extraParams = extraParams + "force=true";
+    }
+    return super.destroy(extraParams)
+  }
+
+  async addResource(template, type="radl", context=true) {
     var contentType = "text/plain"
     if (type == "tosca" || type == "yaml") {
       contentType = "text/yaml";
@@ -259,7 +305,10 @@ class IMInfrastructure extends IMCloudResource {
     const headers = {'Accept': 'application/json',
                       'Authorization': this.client.authData.formatAuthData(),
                       'Content-Type': contentType};
-    const url = this.fullid;
+    var url = this.fullid;
+    if (!context) {
+      url = url + "?context=false";
+    }
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
@@ -307,6 +356,17 @@ class IMInfrastructure extends IMCloudResource {
     }
   }
 
+  async export(del=false) {
+    var extraParams = "";
+    if (del) {
+      extraParams = "?delete=true";
+    }
+    return this.getProperty("data", extraParams)
+  }
+
+  async getOutputs() {
+    return this.getProperty("outputs")
+  }
 }
 
 
@@ -366,4 +426,23 @@ class IMClient {
       }
     }
 
+    async importInfrastructure(data) {
+      const headers = {'Authorization': this.authData.formatAuthData(),
+                       'Content-Type': "application/json"};
+      const url = this.imUrl + '/infrastructures';
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: headers,
+        body: data
+      })
+
+      if (response.ok) {
+        const output = await response.text();
+        var inf = new IMInfrastructure(this, output);
+        return new IMResponse(true, inf, null);
+      } else {
+        const output = await response.json();
+        return new IMResponse(false, null, output['message']);
+      }
+    }
 }
