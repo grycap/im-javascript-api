@@ -498,10 +498,10 @@ class IMInfrastructure extends IMCloudResource {
       method: 'POST',
       headers: headers,
       body: template
-    })
+    });
     const output = await response.json();
     if (response.ok) {
-      newVMs = []
+      var newVMs = [];
       output['uri-list'].forEach(vmID => {
         var vm = new IMVirtualMachine(this.client, vmID['uri']);
         newVMs.push(vm);
