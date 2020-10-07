@@ -178,7 +178,7 @@ class IMCloudResource {
     const response = await fetch(url, {headers: headers});
     const output = await response.json();
     if (response.ok) {
-      return new IMResponse(response.ok, output[prop], null);
+      return new IMResponse(response.ok, output[property], null);
     } else {
       return new IMResponse(response.ok, null, output['message']);
     }
