@@ -661,7 +661,7 @@ class IMClient {
       })
       const output = await response.json();
       if (response.ok) {
-        inf = new IMInfrastructure(this, output['uri'])
+        var inf = new IMInfrastructure(this, output['uri'])
         return new IMResponse(true, inf, null);
       } else {
         return new IMResponse(false, null, output['message']);
