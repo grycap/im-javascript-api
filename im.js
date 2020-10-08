@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+var fetch = null;
+
+try {
+  fetch = require("node-fetch");
+} catch (e) {console.log(e)}
+
+
  /**
  * Helper class to return the IM REST API responses.
  */
@@ -696,3 +703,11 @@ class IMClient {
       }
     }
 }
+
+try {
+  exports.IMAuthDataItem = IMAuthDataItem;
+  exports.IMAuthData = IMAuthData;
+  exports.IMClient = IMClient;
+  exports.IMInfrastructure = IMInfrastructure
+  exports.IMVirtualMachine = IMVirtualMachine
+} catch (e) {}
