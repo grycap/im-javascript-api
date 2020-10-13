@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var fetch = null;
-
+// trick to make it work both in browser and nodejs code
+var fetch = fetch;
 try {
   fetch = require("node-fetch");
 } catch (e) {}

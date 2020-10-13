@@ -325,6 +325,18 @@ describe('infGetState()', function () {
 });
 
 
+describe('addResource()', function () {
+    it('Adding resources to an Inf.', async function () {
+      const addradl = "network publica\nsystem node\ndeploy node 1";
+      const response = await inf.addResource(addradl);
+      assert.ok(response.ok);
+      assert.strictEqual(response.data.length, 1);
+      assert.strictEqual(response.data[0].id, "1");
+    });
+});
+
+
+
 describe('infDestroy()', function () {
     it('Destroy Inf.', async function () {
       const response = await inf.destroy();
