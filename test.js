@@ -11,7 +11,7 @@ var im = new IMClient("https://appsgrycap.i3m.upv.es:31443/im-dev", authData);
 describe('getVersion()', function () {
     it('get IM version', async function () {
       const version = await im.getVersion();
-      assert.strictEqual(version, "1.9.5");
+      assert.ok(version.length > 4);
     });
 });
 
@@ -109,6 +109,17 @@ describe('vmReboot()', function () {
     });
 });
 
+describe('vmAlter()', function () {
+    it('Alter VM size.', async function () {
+        radl = `system node (
+        cpu.count>=2 and
+        memory.size>=512m
+        )`
+      const response = await vm.alter(radl);
+      assert.ok(response.ok);
+    });
+});
+
 describe('vmDestroy()', function () {
     it('Destroy VM.', async function () {
       const response = await vm.destroy();
@@ -121,6 +132,14 @@ describe('infReconfigure()', function () {
     it('Reconfigure Inf.', async function () {
       const response = await inf.reconfigure("");
       assert.ok(response.ok);
+    });
+});
+
+describe('infGetOutputs()', function () {
+    it('Get Outputs of an Inf.', async function () {
+      const response = await inf.getOutputs();
+      assert.ok(!response.ok);
+      assert.strictEqual(response.message, "Error Getting Inf. prop: (403, \"'outputs' infrastructure property is not valid in this infrastructure\")");
     });
 });
 
