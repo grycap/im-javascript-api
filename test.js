@@ -268,7 +268,6 @@ function launchTest() {
 
 }
 
-
 var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user", "password": "pass"})
 var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
 
