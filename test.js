@@ -315,6 +315,16 @@ describe('getInfrastructureList()', function () {
     });
 });
 
+
+describe('infGetState()', function () {
+    it('Getting Inf. State', async function () {
+      const response = await inf.getState();
+      assert.ok(response.ok);
+      assert.deepStrictEqual(response.data, { state: { state: 'running', vm_states: { '0': 'running' } } });
+    });
+});
+
+
 describe('infDestroy()', function () {
     it('Destroy Inf.', async function () {
       const response = await inf.destroy();
