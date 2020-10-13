@@ -2,272 +2,6 @@ var assert = require('assert');
 
 const {IMAuthDataItem, IMAuthData, IMClient, IMInfrastructure, IMVirtualMachine} = require('./im.js');
 
-
-function launchTest() {
-    var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user",
-                                                                    "password": "pass"})
-    var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
-
-    var authData = new IMAuthData([imAuth, oneAuth])
-    var im = new IMClient("https://appsgrycap.i3m.upv.es:31443/im-dev", authData);
-
-    console.log("Running");
-
-    im.getVersion().then(
-        version => {
-            console.log("IM Version: " + version + "\n");
-        }
-    );
-
-    im.getInfrastructureList().then(
-        response => {
-            assert.strict(response.ok);
-            if (response.ok) {
-                console.log("Inf. list");
-                console.log("\n------------------------------------\n");
-                response.data.forEach(inf => {
-                    console.log(inf.id + "\n");
-                });
-                console.log("\n------------------------------------\n");
-            } else {
-                console.log("Error Getting Inf. list");
-                console.log("\n------------------------------------\n");
-                console.log(response.message);
-                console.log("\n------------------------------------\n");
-            }
-        }
-    );
-
-    // Create an infrastructure
-    radl = `network publica (outbound = 'yes')
-    system node (
-    cpu.count>=1 and
-    memory.size>=512m and
-    net_interface.0.connection = 'publica' and
-    net_interface.0.dns_name = 'testnode' and
-    disk.0.os.name='linux' and
-    disk.0.os.flavour='ubuntu' and
-    disk.0.image.url = 'dummy://dummy.com' and
-    disk.0.os.credentials.username = 'dummy'
-    )
-    deploy node 1`
-    im.createInfrastructure(radl).then(
-        response => {
-            if (response.ok) {
-                var inf = response.data;
-                console.log("Create Inf.");
-                console.log("\n------------------------------------\n");
-                console.log("Inf: " + inf.id + " successfully created.");
-                console.log("\n------------------------------------\n");
-
-                addradl = "network publica\nsystem node\ndeploy node 1";
-                inf.addResource(addradl).then(
-                    response => {
-                        if (response.ok) {
-                            console.log("Added VMs");
-                            console.log("\n------------------------------------\n");
-                            response.data.forEach(vm => {
-                                console.log(vm.id + "\n");
-                            })
-                            console.log("\n------------------------------------\n\n");
-
-
-                            // Get infrastructure Info
-                            inf.getInfo().then(
-                                response => {
-                                    if (response.ok) {
-                                        console.log("Inf. Info");
-                                        console.log("\n------------------------------------\n");
-                                        response.data.forEach(vm => {
-
-                                            vm.getInfo().then(
-                                                response => {
-                                                    if (response.ok) {
-                                                        console.log("VM Info");
-                                                        console.log("\n------------------------------------\n");
-                                                        console.log(JSON.stringify(response.data));
-                                                        console.log("\n------------------------------------\n\n");
-                                                    } else {
-                                                        console.log("Error Getting VM Info");
-                                                        console.log("\n------------------------------------\n");
-                                                        console.log(response.message);
-                                                        console.log("\n------------------------------------\n\n");
-                                                    }
-                                                }
-                                            );
-
-
-                                            vm.reboot().then(
-                                                response => {
-                                                    if (response.ok) {
-                                                        console.log("VM reboot");
-                                                        console.log("\n------------------------------------\n");
-                                                        console.log("Sucess\n");
-                                                        console.log("\n------------------------------------\n\n");
-                                                    } else {
-                                                        console.log("Error rebooting VM");
-                                                        console.log("\n------------------------------------\n");
-                                                        console.log(response.message);
-                                                        console.log("\n------------------------------------\n\n");
-                                                    }
-                                                }
-                                            );
-                                        
-                                        });
-                                        console.log("\n------------------------------------\n");
-                                    } else {
-                                        console.log("Error Getting Inf. Info");
-                                        console.log("\n------------------------------------\n");
-                                        console.log(response.message);
-                                        console.log("\n------------------------------------\n\n");
-                                    }
-
-                                    inf.getState().then(
-                                        response => {
-                                            if (response.ok) {
-                                                console.log("Get Inf. State");
-                                                console.log("\n------------------------------------\n");
-                                                console.log(inf.state + "\n");
-                                                inf.vms.forEach(vm => {
-                                                    console.log(vm.id + ": " + vm.state + "\n");
-                                                })
-                                                console.log("\n------------------------------------\n\n");
-                                            } else {
-                                                console.log("Error Getting Inf. State");
-                                                console.log("\n------------------------------------\n");
-                                                console.log(response.message);
-                                                console.log("\n------------------------------------\n\n");
-                                            }
-                                        }
-                                    );
-
-                                    inf.start().then(
-                                        response => {
-                                            if (response.ok) {
-                                                console.log("Start Inf");
-                                                console.log("\n------------------------------------\n");
-                                                console.log("Started!\n");
-                                                console.log("\n------------------------------------\n\n");
-                                            } else {
-                                                console.log("Error starting Inf.");
-                                                console.log("\n------------------------------------\n");
-                                                console.log(response.message);
-                                                console.log("\n------------------------------------\n\n");
-                                            }
-                                        }
-                                    );
-
-                                    inf.getContMsg().then(
-                                        response => {
-                                            if (response.ok) {
-                                                console.log("Get Inf. Cont Msg");
-                                                console.log("\n------------------------------------\n");
-                                                console.log(response.data);
-                                                console.log("\n------------------------------------\n\n");
-                                            } else {
-                                                console.log("Error geting Infcont msg.");
-                                                console.log("\n------------------------------------\n");
-                                                console.log(response.message);
-                                                console.log("\n------------------------------------\n\n");
-                                            }
-
-                                        }
-                                    );
-
-
-
-
-                                    inf.vms[1].destroy().then(
-                                        response => {
-                                            if (response.ok) {
-                                                console.log("Delete VM.");
-                                                console.log("\n------------------------------------\n");
-                                                console.log("Successfully deleted");
-                                                console.log("\n------------------------------------\n\n");
-                                            } else {
-                                                console.log("Error Deleting VM.");
-                                                console.log("\n------------------------------------\n");
-                                                console.log(response.message);
-                                                console.log("\n------------------------------------\n\n");
-                                            }
-
-
-                                            inf.reconfigure("").then(
-                                                response => {
-                                                    if (response.ok) {
-                                                        console.log("Reconfigured Inf.");
-                                                        console.log("\n------------------------------------\n");
-                                                        console.log("Successfully reconfigured");
-                                                        console.log("\n------------------------------------\n\n");
-                                                    } else {
-                                                        console.log("Error Reconfiguring Inf.");
-                                                        console.log("\n------------------------------------\n");
-                                                        console.log(response.message);
-                                                        console.log("\n------------------------------------\n\n");
-                                                    }
-
-
-                                                    inf.destroy().then(
-                                                        response => {
-                                                            if (response.ok) {
-                                                                console.log("Delete Inf.");
-                                                                console.log("\n------------------------------------\n");
-                                                                console.log("Successfully deleted");
-                                                                console.log("\n------------------------------------\n\n");
-                                                            } else {
-                                                                console.log("Error Deleting Inf.");
-                                                                console.log("\n------------------------------------\n");
-                                                                console.log(response.message);
-                                                                console.log("\n------------------------------------\n\n");
-                                                            }
-
-                                                            console.log("Finished");
-                                                        }
-                                                    );
-
-
-
-                                                }
-                                            );
-
-
-                                            
-                                        }
-                                    );
-                                    
-
-
-
-                                }
-                            );
-
-
-
-                            
-                        } else {
-                            console.log("Error Adding VMs");
-                            console.log("\n------------------------------------\n");
-                            console.log(response.message);
-                            console.log("\n------------------------------------\n\n");
-                        }
-                    }
-                );
-
-
-
-
-
-            } else {
-                console.log("Error Creating Inf.");
-                console.log("\n------------------------------------\n");
-                console.log(response.message);
-                console.log("\n------------------------------------\n\n");
-            }
-        }
-    )
-
-}
-
 var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user", "password": "pass"})
 var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
 
@@ -315,7 +49,6 @@ describe('getInfrastructureList()', function () {
     });
 });
 
-
 describe('infGetState()', function () {
     it('Getting Inf. State', async function () {
       const response = await inf.getState();
@@ -335,7 +68,75 @@ describe('addResource()', function () {
     });
 });
 
+var vm = null;
 
+describe('infGetInfo()', function () {
+    it('Getting Inf. Info', async function () {
+      const response = await inf.getInfo();
+      assert.ok(response.ok);
+      assert.deepStrictEqual(response.data.length, 2);
+      assert.deepStrictEqual(response.data[0].id, "0");
+      assert.deepStrictEqual(response.data[1].id, "1");
+      vm = response.data[1];
+    });
+});
+
+describe('infgetContMsg()', function () {
+    it('GetContMsg of an Inf.', async function () {
+      const response = await inf.getContMsg();
+      assert.ok(response.ok);
+    });
+});
+
+describe('vmStop()', function () {
+    it('Stop VM.', async function () {
+      const response = await vm.stop();
+      assert.ok(response.ok);
+    });
+});
+
+describe('vmStart()', function () {
+    it('Start VM.', async function () {
+      const response = await vm.start();
+      assert.ok(response.ok);
+    });
+});
+
+describe('vmReboot()', function () {
+    it('Reboot VM.', async function () {
+      const response = await vm.reboot();
+      assert.ok(response.ok);
+    });
+});
+
+describe('vmDestroy()', function () {
+    it('Destroy VM.', async function () {
+      const response = await vm.destroy();
+      assert.ok(response.ok);
+    });
+});
+
+
+describe('infReconfigure()', function () {
+    it('Reconfigure Inf.', async function () {
+      const response = await inf.reconfigure("");
+      assert.ok(response.ok);
+    });
+});
+
+describe('InfStop()', function () {
+    it('Stop Inf.', async function () {
+      const response = await inf.stop();
+      assert.ok(response.ok);
+    });
+});
+
+describe('InfStart()', function () {
+    it('Start Inf.', async function () {
+      const response = await inf.start();
+      assert.ok(response.ok);
+    });
+});
 
 describe('infDestroy()', function () {
     it('Destroy Inf.', async function () {
