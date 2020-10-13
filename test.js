@@ -268,7 +268,6 @@ function launchTest() {
 
 }
 
-
 var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user", "password": "pass"})
 var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
 
@@ -315,6 +314,16 @@ describe('getInfrastructureList()', function () {
       assert.strictEqual(response.data.length, 1);
     });
 });
+
+
+describe('infGetState()', function () {
+    it('Getting Inf. State', async function () {
+      const response = await inf.getState();
+      assert.ok(response.ok);
+      assert.deepStrictEqual(response.data, { state: { state: 'running', vm_states: { '0': 'running' } } });
+    });
+});
+
 
 describe('infDestroy()', function () {
     it('Destroy Inf.', async function () {
