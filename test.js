@@ -1,3 +1,5 @@
+var assert = require('assert');
+
 const {IMAuthDataItem, IMAuthData, IMClient, IMInfrastructure, IMVirtualMachine} = require('./im.js');
 
 
@@ -19,6 +21,7 @@ function launchTest() {
 
     im.getInfrastructureList().then(
         response => {
+            assert.strict(response.ok);
             if (response.ok) {
                 console.log("Inf. list");
                 console.log("\n------------------------------------\n");
@@ -265,4 +268,57 @@ function launchTest() {
 
 }
 
-launchTest();
+
+var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user", "password": "pass"})
+var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
+
+var authData = new IMAuthData([imAuth, oneAuth])
+var im = new IMClient("https://appsgrycap.i3m.upv.es:31443/im-dev", authData);
+
+describe('getVersion()', function () {
+    it('get IM version', async function () {
+      const version = await im.getVersion();
+      assert.strictEqual(version, "1.9.5");
+    });
+});
+
+
+var inf = null;
+
+// Create an infrastructure
+describe('createInfrastructure()', function () {
+    it('Create an Infrastructure', async function () {
+        radl = `network publica (outbound = 'yes')
+        system node (
+        cpu.count>=1 and
+        memory.size>=512m and
+        net_interface.0.connection = 'publica' and
+        net_interface.0.dns_name = 'testnode' and
+        disk.0.os.name='linux' and
+        disk.0.os.flavour='ubuntu' and
+        disk.0.image.url = 'dummy://dummy.com' and
+        disk.0.os.credentials.username = 'dummy'
+        )
+        deploy node 1`
+      const response = await im.createInfrastructure(radl);
+      assert.ok(response.ok);
+      inf = response.data;
+      assert.strictEqual(inf.id.length, 36);
+    });
+});
+
+
+describe('getInfrastructureList()', function () {
+    it('Get the list of Infrastructures.', async function () {
+      const response = await im.getInfrastructureList();
+      assert.ok(response.ok);
+      assert.strictEqual(response.data.length, 1);
+    });
+});
+
+describe('infDestroy()', function () {
+    it('Destroy Inf.', async function () {
+      const response = await inf.destroy();
+      assert.ok(response.ok);
+    });
+});

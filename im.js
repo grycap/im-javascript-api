@@ -18,7 +18,7 @@ var fetch = null;
 
 try {
   fetch = require("node-fetch");
-} catch (e) {console.log(e)}
+} catch (e) {}
 
 
  /**
