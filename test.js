@@ -88,6 +88,15 @@ describe('infgetContMsg()', function () {
     });
 });
 
+describe('vmGetInfo()', function () {
+    it('Get info of a VM.', async function () {
+      const response = await vm.getInfo();
+      assert.ok(response.ok);
+      assert.strictEqual(response.data[1]["class"], "system");
+      assert.strictEqual(response.data[1]["id"], "node");
+    });
+});
+
 describe('vmStop()', function () {
     it('Stop VM.', async function () {
       const response = await vm.stop();
@@ -140,6 +149,14 @@ describe('infGetOutputs()', function () {
       const response = await inf.getOutputs();
       assert.ok(!response.ok);
       assert.strictEqual(response.message, "Error Getting Inf. prop: (403, \"'outputs' infrastructure property is not valid in this infrastructure\")");
+    });
+});
+
+describe('InfExport()', function () {
+    it('Export Inf.', async function () {
+      const response = await inf.export();
+      assert.ok(response.ok);
+      assert.ok(response.data.length>200);
     });
 });
 
