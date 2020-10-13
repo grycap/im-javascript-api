@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"test": "JUNIT_REPORT_PATH=/tmp/report.xml ./node_modules/mocha/bin/mocha --colors --reporter mocha-jenkins-reporter"
+		"test": "JUNIT_REPORT_PATH=./report.xml ./node_modules/mocha/bin/mocha --colors --reporter mocha-jenkins-reporter"
 	},
 	"dependencies": {
 		"mocha": "^8.1.3",
