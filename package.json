@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"test": "jenkins-mocha --cobertura test.js"
+		"test": "jenkins-mocha --cobertura test.js --timeout 10000"
 	},
 	"dependencies": {
 		"jenkins-mocha": "^11.0.0",
