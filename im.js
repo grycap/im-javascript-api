@@ -18,7 +18,9 @@
 var fetch = fetch;
 try {
   fetch = require("node-fetch");
-} catch (e) {}
+} catch (e) {
+  console.log("node-fetch not found. Running in browser mode.");
+}
 
 
  /**

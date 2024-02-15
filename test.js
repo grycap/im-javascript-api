@@ -2,11 +2,11 @@ var assert = require('assert');
 
 const {IMAuthDataItem, IMAuthData, IMClient, IMInfrastructure, IMVirtualMachine} = require('./im.js');
 
-var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "user", "password": "pass"})
+var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "userjs", "password": "passjs"})
 var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
 
 var authData = new IMAuthData([imAuth, oneAuth])
-var im = new IMClient("https://appsgrycap.i3m.upv.es:31443/im-dev", authData);
+var im = new IMClient("https://appsgrycap.i3m.upv.es/im-dev", authData);
 
 describe('getVersion()', function () {
     it('get IM version', async function () {

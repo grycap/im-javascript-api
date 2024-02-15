@@ -3,8 +3,8 @@
 		"test": "jenkins-mocha --cobertura test.js"
 	},
 	"dependencies": {
-		"jenkins-mocha": "^8.0.0",
-		"mocha": "^8.1.3",
-		"node-fetch": "^2.6.1"
+		"jenkins-mocha": "^11.0.0",
+		"mocha": "^10.3.0",
+		"node-fetch": "^2.7.0"
 	}
 }
