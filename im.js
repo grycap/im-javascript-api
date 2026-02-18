@@ -17,7 +17,8 @@
 // trick to make it work both in browser and nodejs code
 var fetch = fetch;
 try {
-  fetch = require("node-fetch");
+  const nodeFetch = require("node-fetch");
+  fetch = nodeFetch.default || nodeFetch;
 } catch (e) {
   console.log("node-fetch not found. Running in browser mode.");
 }
@@ -704,6 +705,28 @@ class IMClient {
         return new IMResponse(false, null, output['message']);
       }
     }
+
+  /**
+    * Get the quotas or images of a cloud provider
+    * 
+    * @param {string} cloud_id: String with the ID of the cloud provider.
+    * @param {string} type: String with the type of info to retrieve (quotas or images).
+    * 
+    * @return {IMResponse}: Returns an IMResponse object with data = Object with the quotas or images in case of success.
+    */
+    async getCloudInfo(cloud_id, type) {
+      const headers = {'Accept': 'application/json',
+                       'Authorization': this.authData.formatAuthData()};
+      const url = this.imUrl + '/clouds/' + cloud_id + '/' + type;
+      const response = await fetch(url, {headers: headers});
+      const output = await response.json();
+      if (response.ok) {
+        return new IMResponse(true, output[type], null);
+      } else {
+        return new IMResponse(false, null, output['message']);
+      }
+    }
+
 }
 
 try {

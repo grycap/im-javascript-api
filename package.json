@@ -4,7 +4,7 @@
 	},
 	"dependencies": {
 		"jenkins-mocha": "^11.0.0",
-		"mocha": "^10.3.0",
-		"node-fetch": "^2.7.0"
+		"mocha": "^10.8.2",
+		"node-fetch": "^3.3.2"
 	}
 }

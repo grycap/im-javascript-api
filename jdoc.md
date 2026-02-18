@@ -1,321 +1,479 @@
-# Documentation
+## Classes
 
-## `class IMResponse`
+<dl>
+<dt><a href="#IMResponse">IMResponse</a></dt>
+<dd><p>Helper class to return the IM REST API responses.</p>
+</dd>
+<dt><a href="#IMAuthDataItem">IMAuthDataItem</a></dt>
+<dd><p>This class represents the IM auth data item.</p>
+</dd>
+<dt><a href="#IMAuthData">IMAuthData</a></dt>
+<dd><p>This class represents the IM auth data (a list of IMAuthDataItem).</p>
+</dd>
+<dt><a href="#IMCloudResource">IMCloudResource</a></dt>
+<dd><p>This class represents a base class for the Cloud Resources Object.</p>
+</dd>
+<dt><a href="#IMVirtualMachine">IMVirtualMachine</a></dt>
+<dd><p>This class represents a Virtual Machine Object.</p>
+</dd>
+<dt><a href="#IMInfrastructure">IMInfrastructure</a></dt>
+<dd><p>This class represents an Infrastructure Object.</p>
+</dd>
+<dt><a href="#IMClient">IMClient</a></dt>
+<dd><p>This is the main class to access the REST API of the Infrastructure Manager.
+See this links for more info about IM REST API:</p>
+<ul>
+<li><a href="https://imdocs.readthedocs.io/en/latest/REST.html">https://imdocs.readthedocs.io/en/latest/REST.html</a></li>
+<li><a href="https://app.swaggerhub.com/apis-docs/grycap/InfrastructureManager/">https://app.swaggerhub.com/apis-docs/grycap/InfrastructureManager/</a></li>
+</ul>
+</dd>
+</dl>
 
+<a name="IMResponse"></a>
+
+## IMResponse
 Helper class to return the IM REST API responses.
 
-## `constructor(ok, data, message)`
+**Kind**: global class  
+<a name="new_IMResponse_new"></a>
 
+### new IMResponse(ok:, data:, message:)
 Constructor.
 
- * **Parameters:**
-   * `ok:` — `boolean` — Flag to identify if the response has been successful.
-   * `data:` — `object` — Result of the call in case of success.
-   * `message:` — `string` — Error message in case of error.
 
-## `class IMAuthDataItem`
+| Param | Type | Description |
+| --- | --- | --- |
+| ok: | <code>boolean</code> | Flag to identify if the response has been successful. |
+| data: | <code>object</code> | Result of the call in case of success. |
+| message: | <code>string</code> | Error message in case of error. |
 
+<a name="IMAuthDataItem"></a>
+
+## IMAuthDataItem
 This class represents the IM auth data item.
 
-## `constructor(id, type, fields)`
+**Kind**: global class  
 
-Constructor. For valid values see: https://imdocs.readthedocs.io/en/latest/client.html#auth-file
+* [IMAuthDataItem](#IMAuthDataItem)
+    * [new IMAuthDataItem(id:, type:, fields:)](#new_IMAuthDataItem_new)
+    * [.toAuthLine()](#IMAuthDataItem+toAuthLine) ⇒ <code>string</code>
 
- * **Parameters:**
-   * `id:` — `string` — ID of the auth item.
-   * `type:` — `string` — Type of the auth item.
-   * `fields:` — `object` — Dictionary with the auth data.
+<a name="new_IMAuthDataItem_new"></a>
 
-## `toAuthLine()`
+### new IMAuthDataItem(id:, type:, fields:)
+Constructor.
+For valid values see: https://imdocs.readthedocs.io/en/latest/client.html#auth-file
 
+
+| Param | Type | Description |
+| --- | --- | --- |
+| id: | <code>string</code> | ID of the auth item. |
+| type: | <code>string</code> | Type of the auth item. |
+| fields: | <code>object</code> | Dictionary with the auth data. |
+
+<a name="IMAuthDataItem+toAuthLine"></a>
+
+### imAuthDataItem.toAuthLine() ⇒ <code>string</code>
 Format this Auth item into an IM auth line.
 
- * **Returns:** `string` — the formatted auth line.
+**Kind**: instance method of [<code>IMAuthDataItem</code>](#IMAuthDataItem)  
+**Returns**: <code>string</code> - the formatted auth line.  
+<a name="IMAuthData"></a>
 
-## `class IMAuthData`
-
+## IMAuthData
 This class represents the IM auth data (a list of IMAuthDataItem).
 
-## `constructor(authList)`
+**Kind**: global class  
 
-Constructor. For valid values see: https://imdocs.readthedocs.io/en/latest/client.html#auth-file
+* [IMAuthData](#IMAuthData)
+    * [new IMAuthData(authList:)](#new_IMAuthData_new)
+    * [.formatAuthData()](#IMAuthData+formatAuthData) ⇒ <code>string</code>
 
- * **Parameters:** `authList:` — `array` — Array of IMAuthDataItem elements.
+<a name="new_IMAuthData_new"></a>
 
-## `formatAuthData()`
+### new IMAuthData(authList:)
+Constructor.
+For valid values see: https://imdocs.readthedocs.io/en/latest/client.html#auth-file
 
+
+| Param | Type | Description |
+| --- | --- | --- |
+| authList: | <code>array</code> | Array of IMAuthDataItem elements. |
+
+<a name="IMAuthData+formatAuthData"></a>
+
+### imAuthData.formatAuthData() ⇒ <code>string</code>
 Format this Auth data into an IM auth valid format..
 
- * **Returns:** `string` — the formatted auth data.
+**Kind**: instance method of [<code>IMAuthData</code>](#IMAuthData)  
+**Returns**: <code>string</code> - the formatted auth data.  
+<a name="IMCloudResource"></a>
 
-## `class IMCloudResource`
-
+## IMCloudResource
 This class represents a base class for the Cloud Resources Object.
 
-## `constructor(client)`
+**Kind**: global class  
 
+* [IMCloudResource](#IMCloudResource)
+    * [new IMCloudResource(client:)](#new_IMCloudResource_new)
+    * [.destroy(extraParams:)](#IMCloudResource+destroy) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getInfo()](#IMCloudResource+getInfo) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getProperty(property:, extraParams:)](#IMCloudResource+getProperty) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getContMsg()](#IMCloudResource+getContMsg) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.performOperation(operation:)](#IMCloudResource+performOperation) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.start()](#IMCloudResource+start) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.stop()](#IMCloudResource+stop) ⇒ [<code>IMResponse</code>](#IMResponse)
+
+<a name="new_IMCloudResource_new"></a>
+
+### new IMCloudResource(client:)
 Constructor.
 
- * **Parameters:** `client:` — `IMClient` — Reference to the IMClient object.
 
-## `async destroy(extraParams="")`
+| Param | Type | Description |
+| --- | --- | --- |
+| client: | [<code>IMClient</code>](#IMClient) | Reference to the IMClient object. |
 
+<a name="IMCloudResource+destroy"></a>
+
+### imCloudResource.destroy(extraParams:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Destroy the Cloud resource.
 
- * **Parameters:** `extraParams:` — `string` — Extra parameters to be appended to the end of the URL of the object.
+**Kind**: instance method of [<code>IMCloudResource</code>](#IMCloudResource)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+| Param | Type | Description |
+| --- | --- | --- |
+| extraParams: | <code>string</code> | Extra parameters to be appended to the end of the URL of the object. |
 
-## `async getInfo()`
+<a name="IMCloudResource+getInfo"></a>
 
+### imCloudResource.getInfo() ⇒ [<code>IMResponse</code>](#IMResponse)
 Get Info about the Cloud resource.
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = Object Info in case of success.
+**Kind**: instance method of [<code>IMCloudResource</code>](#IMCloudResource)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object Info in case of success.  
+<a name="IMCloudResource+getProperty"></a>
 
-## `async getProperty(property, extraParams="")`
-
+### imCloudResource.getProperty(property:, extraParams:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Get a Cloud Resource property.
 
- * **Parameters:**
-   * `property:` — `string` — Property to retrieve.
-   * `extraParams:` — `string` — Extra parameters to be appended to the end of the URL of the object.
+**Kind**: instance method of [<code>IMCloudResource</code>](#IMCloudResource)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object property in case of success.  
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = Object property in case of success.
+| Param | Type | Description |
+| --- | --- | --- |
+| property: | <code>string</code> | Property to retrieve. |
+| extraParams: | <code>string</code> | Extra parameters to be appended to the end of the URL of the object. |
 
-## `async getContMsg()`
+<a name="IMCloudResource+getContMsg"></a>
 
+### imCloudResource.getContMsg() ⇒ [<code>IMResponse</code>](#IMResponse)
 Get the Cloud Resource Contextualization Log.
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = Context. Log in case of success.
+**Kind**: instance method of [<code>IMCloudResource</code>](#IMCloudResource)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Context. Log in case of success.  
+<a name="IMCloudResource+performOperation"></a>
 
-## `async performOperation(operation)`
-
+### imCloudResource.performOperation(operation:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Perform an operation on the Cloud Resource.
 
- * **Parameters:** `operation:` — `string` — Operation to perform.
+**Kind**: instance method of [<code>IMCloudResource</code>](#IMCloudResource)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+| Param | Type | Description |
+| --- | --- | --- |
+| operation: | <code>string</code> | Operation to perform. |
 
-## `async start()`
+<a name="IMCloudResource+start"></a>
 
+### imCloudResource.start() ⇒ [<code>IMResponse</code>](#IMResponse)
 Perform an start operation on the Cloud Resource.
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+**Kind**: instance method of [<code>IMCloudResource</code>](#IMCloudResource)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
+<a name="IMCloudResource+stop"></a>
 
-## `async stop()`
-
+### imCloudResource.stop() ⇒ [<code>IMResponse</code>](#IMResponse)
 Perform an stop operation on the Cloud Resource.
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+**Kind**: instance method of [<code>IMCloudResource</code>](#IMCloudResource)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
+<a name="IMVirtualMachine"></a>
 
-## `class IMVirtualMachine extends IMCloudResource`
-
+## IMVirtualMachine
 This class represents a Virtual Machine Object.
 
-## `constructor(client, infid, id)`
+**Kind**: global class  
 
+* [IMVirtualMachine](#IMVirtualMachine)
+    * [new IMVirtualMachine(client:, infid:, id:)](#new_IMVirtualMachine_new)
+    * [.destroy(context:)](#IMVirtualMachine+destroy) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.extractInfo(data:)](#IMVirtualMachine+extractInfo) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.reboot()](#IMVirtualMachine+reboot) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.createDiskSnapshot(diskNum:, imageName:, autoDelete:)](#IMVirtualMachine+createDiskSnapshot) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.alter(template:, type:)](#IMVirtualMachine+alter) ⇒ [<code>IMResponse</code>](#IMResponse)
+
+<a name="new_IMVirtualMachine_new"></a>
+
+### new IMVirtualMachine(client:, infid:, id:)
 Constructor.
 
- * **Parameters:**
-   * `client:` — `IMClient` — Reference to the IMClient object.
-   * `infid:` — `string` — ID of the Infrastructure or the full URL of the VM ID.
-   * `id:` — `string` — (Optional) ID of the VM. In this case infid must be the Infrastructure ID.
 
-## `async destroy(context=true)`
+| Param | Type | Description |
+| --- | --- | --- |
+| client: | [<code>IMClient</code>](#IMClient) | Reference to the IMClient object. |
+| infid: | <code>string</code> | ID of the Infrastructure or the full URL of the VM ID. |
+| id: | <code>string</code> | (Optional) ID of the VM. In this case infid must be the Infrastructure ID. |
 
+<a name="IMVirtualMachine+destroy"></a>
+
+### imVirtualMachine.destroy(context:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Destroy the VM.
 
- * **Parameters:** `context:` — `boolean` — Flag to enable/disable the contextulization process after VM deletion.
+**Kind**: instance method of [<code>IMVirtualMachine</code>](#IMVirtualMachine)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
 
-     Default value "true".
+| Param | Type | Description |
+| --- | --- | --- |
+| context: | <code>boolean</code> | Flag to enable/disable the contextulization process after VM deletion.                           Default value "true". |
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+<a name="IMVirtualMachine+extractInfo"></a>
 
-## `extractInfo(data)`
-
+### imVirtualMachine.extractInfo(data:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Internal function to extrac the data in the IMCloudResource getInfo
 
- * **Parameters:** `data:` — `object` — data returned by the getInfo function.
+**Kind**: instance method of [<code>IMVirtualMachine</code>](#IMVirtualMachine)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns the radl field of the data.  
 
-     <p>
- * **Returns:** `IMResponse}` — Returns the radl field of the data.
+| Param | Type | Description |
+| --- | --- | --- |
+| data: | <code>object</code> | data returned by the getInfo function. |
 
-## `async reboot()`
+<a name="IMVirtualMachine+reboot"></a>
 
+### imVirtualMachine.reboot() ⇒ [<code>IMResponse</code>](#IMResponse)
 Perform an reboot operation on the VM.
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+**Kind**: instance method of [<code>IMVirtualMachine</code>](#IMVirtualMachine)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
+<a name="IMVirtualMachine+createDiskSnapshot"></a>
 
-## `async createDiskSnapshot(diskNum, imageName, autoDelete=false)`
-
+### imVirtualMachine.createDiskSnapshot(diskNum:, imageName:, autoDelete:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Creates a disk snapshot.
 
- * **Parameters:**
-   * `diskNum:` — `string` — Number of the disk to create the snapshot.
-   * `imageName:` — `string` — Name to set to the disk snapshot.
-   * `autoDelete:` — `boolean` — Optional flag to delete/not delete the snapshot on VM deletion.
+**Kind**: instance method of [<code>IMVirtualMachine</code>](#IMVirtualMachine)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
 
-     Default value: "false".
+| Param | Type | Description |
+| --- | --- | --- |
+| diskNum: | <code>string</code> | Number of the disk to create the snapshot. |
+| imageName: | <code>string</code> | Name to set to the disk snapshot. |
+| autoDelete: | <code>boolean</code> | Optional flag to delete/not delete the snapshot on VM deletion.                              Default value: "false". |
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+<a name="IMVirtualMachine+alter"></a>
 
-## `async alter(template, type="radl")`
-
+### imVirtualMachine.alter(template:, type:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Modify the features of this VM.
 
- * **Parameters:**
-   * `template:` — `string` — template body to alter the VM.
-   * `type:` — `string` — Optional type of the template format (radl, tosca, yaml or json).
+**Kind**: instance method of [<code>IMVirtualMachine</code>](#IMVirtualMachine)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
 
-     Default value: "radl".
+| Param | Type | Description |
+| --- | --- | --- |
+| template: | <code>string</code> | template body to alter the VM. |
+| type: | <code>string</code> | Optional type of the template format (radl, tosca, yaml or json).                       Default value: "radl". |
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+<a name="IMInfrastructure"></a>
 
-## `class IMInfrastructure extends IMCloudResource`
-
+## IMInfrastructure
 This class represents an Infrastructure Object.
 
-## `constructor(client, id)`
+**Kind**: global class  
 
+* [IMInfrastructure](#IMInfrastructure)
+    * [new IMInfrastructure(client:, id:)](#new_IMInfrastructure_new)
+    * [.extractInfo(data:)](#IMInfrastructure+extractInfo) ⇒ <code>array</code>
+    * [.getState()](#IMInfrastructure+getState) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.destroy(async:, force:)](#IMInfrastructure+destroy) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.addResource(template:, type:, context:)](#IMInfrastructure+addResource) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.reconfigure(template:, type:, vmList:)](#IMInfrastructure+reconfigure) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.export(del:)](#IMInfrastructure+export) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getOutputs()](#IMInfrastructure+getOutputs) ⇒ [<code>IMResponse</code>](#IMResponse)
+
+<a name="new_IMInfrastructure_new"></a>
+
+### new IMInfrastructure(client:, id:)
 Constructor.
 
- * **Parameters:**
-   * `client:` — `IMClient` — Reference to the IMClient object.
-   * `id:` — `string` — ID of the Infrastructure (could the full URL or the only ID)
 
-## `extractInfo(data)`
+| Param | Type | Description |
+| --- | --- | --- |
+| client: | [<code>IMClient</code>](#IMClient) | Reference to the IMClient object. |
+| id: | <code>string</code> | ID of the Infrastructure (could the full URL or the only ID) |
 
+<a name="IMInfrastructure+extractInfo"></a>
+
+### imInfrastructure.extractInfo(data:) ⇒ <code>array</code>
 Internal function to extrac the data in the IMCloudResource getInfo
 
- * **Parameters:** `data:` — `object` — data returned by the getInfo function.
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: <code>array</code> - : Returns the list of VMs.  
 
-     <p>
- * **Returns:** `array}` — Returns the list of VMs.
+| Param | Type | Description |
+| --- | --- | --- |
+| data: | <code>object</code> | data returned by the getInfo function. |
 
-## `async getState()`
+<a name="IMInfrastructure+getState"></a>
 
-Get the Infrastructure State. Also updates the state attribute in this object and in the VMs.
+### imInfrastructure.getState() ⇒ [<code>IMResponse</code>](#IMResponse)
+Get the Infrastructure State.
+Also updates the state attribute in this object and in the VMs.
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data =
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data =
+                      '{"state": {"state": "running", "vm_states": {"0": "running", "1": running}}}'
+                      in case of success.  
+<a name="IMInfrastructure+destroy"></a>
 
-     '{"state": {"state": "running", "vm_states": {"0": "running", "1": running}}}'
-
-     in case of success.
-
-## `async destroy(async=false, force=false)`
-
+### imInfrastructure.destroy(async:, force:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Destroy the Infrastructure.
 
- * **Parameters:**
-   * `async:` — `boolean` — Flag to make the deletion process async/sync.
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
 
-     Default value "false".
-   * `force:` — `boolean` — Flag to force the deletion of the infrastructure.
+| Param | Type | Description |
+| --- | --- | --- |
+| async: | <code>boolean</code> | Flag to make the deletion process async/sync.                         Default value "false". |
+| force: | <code>boolean</code> | Flag to force the deletion of the infrastructure.                         Default value "false". |
 
-     Default value "false".
+<a name="IMInfrastructure+addResource"></a>
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = "" in case of success.
+### imInfrastructure.addResource(template:, type:, context:) ⇒ [<code>IMResponse</code>](#IMResponse)
+Add resources to this infrastructure.
+In case of success new VMs will be added to the list of VMs of this infrastructure.
 
-## `async addResource(template, type="radl", context=true)`
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = array of new VM IDs in case of success.  
 
-Add resources to this infrastructure. In case of success new VMs will be added to the list of VMs of this infrastructure.
+| Param | Type | Description |
+| --- | --- | --- |
+| template: | <code>string</code> | template body to create the new resources. |
+| type: | <code>string</code> | Optional type of the template format (radl, tosca, yaml or json).                       Default value: "radl". |
+| context: | <code>boolean</code> | Flag to enable/disable the contextulization process after VM addition.                           Default value "true". |
 
- * **Parameters:**
-   * `template:` — `string` — template body to create the new resources.
-   * `type:` — `string` — Optional type of the template format (radl, tosca, yaml or json).
+<a name="IMInfrastructure+reconfigure"></a>
 
-     Default value: "radl".
-   * `context:` — `boolean` — Flag to enable/disable the contextulization process after VM addition.
-
-     Default value "true".
-
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = array of new VM IDs in case of success.
-
-## `async reconfigure(template, type="radl", vmList="")`
-
+### imInfrastructure.reconfigure(template:, type:, vmList:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Reconfigure this infrastructure.
 
- * **Parameters:**
-   * `template:` — `string` — template body to reconfigure.
-   * `type:` — `string` — Optional type of the template format (radl or json).
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = array of new VM IDs in case of success.  
 
-     Default value: "radl".
-   * `vmList:` — `string` — Optional comma separated list of VMs to reconfigure.
+| Param | Type | Description |
+| --- | --- | --- |
+| template: | <code>string</code> | template body to reconfigure. |
+| type: | <code>string</code> | Optional type of the template format (radl or json).                       Default value: "radl". |
+| vmList: | <code>string</code> | Optional comma separated list of VMs to reconfigure.                         Default value "" (it means all VMs). |
 
-     Default value "" (it means all VMs).
+<a name="IMInfrastructure+export"></a>
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = array of new VM IDs in case of success.
-
-## `async export(del=false)`
-
+### imInfrastructure.export(del:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Export the data of this infrastructure to migrate it to another IM service.
 
- * **Parameters:** `del:` — `boolean` — Flag to delete the infrastructure from the IM service.
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object with JSON data in case of success.  
 
-     It will not delete the resources, only removes the data from the IM instance.
+| Param | Type | Description |
+| --- | --- | --- |
+| del: | <code>boolean</code> | Flag to delete the infrastructure from the IM service.                       It will not delete the resources, only removes the data from the IM instance.                       Default value "false". |
 
-     Default value "false".
+<a name="IMInfrastructure+getOutputs"></a>
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = Object with JSON data in case of success.
+### imInfrastructure.getOutputs() ⇒ [<code>IMResponse</code>](#IMResponse)
+Get the outputs of an Infrastructure.
+It must have been created using a TOSCA template.
 
-## `async getOutputs()`
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object with JSON outputs in case of success.  
+<a name="IMClient"></a>
 
-Get the outputs of an Infrastructure. It must have been created using a TOSCA template.
+## IMClient
+This is the main class to access the REST API of the Infrastructure Manager.
+See this links for more info about IM REST API:
+ - https://imdocs.readthedocs.io/en/latest/REST.html
+ - https://app.swaggerhub.com/apis-docs/grycap/InfrastructureManager/
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = Object with JSON outputs in case of success.
+**Kind**: global class  
 
-## `class IMClient`
+* [IMClient](#IMClient)
+    * [new IMClient(imUrl:, authData:)](#new_IMClient_new)
+    * [.getVersion()](#IMClient+getVersion) ⇒ <code>string</code>
+    * [.getInfrastructureList()](#IMClient+getInfrastructureList) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.createInfrastructure(template:, type:)](#IMClient+createInfrastructure) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.importInfrastructure(data:)](#IMClient+importInfrastructure) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getCloudInfo(cloud_id:, type:)](#IMClient+getCloudInfo) ⇒ [<code>IMResponse</code>](#IMResponse)
 
-This is the main class to access the REST API of the Infrastructure Manager. See this links for more info about IM REST API: - https://imdocs.readthedocs.io/en/latest/REST.html - https://app.swaggerhub.com/apis-docs/grycap/InfrastructureManager/
+<a name="new_IMClient_new"></a>
 
-## `constructor(imUrl, authData)`
-
+### new IMClient(imUrl:, authData:)
 Constructor.
 
- * **Parameters:**
-   * `imUrl:` — `string` — URL of the IM service.
-   * `authData:` — `IMAuthData` — Auth data to interact with the IM service.
 
-## `async getVersion()`
+| Param | Type | Description |
+| --- | --- | --- |
+| imUrl: | <code>string</code> | URL of the IM service. |
+| authData: | [<code>IMAuthData</code>](#IMAuthData) | Auth data to interact with the IM service. |
 
+<a name="IMClient+getVersion"></a>
+
+### imClient.getVersion() ⇒ <code>string</code>
 Gets IM service version.
 
- * **Returns:** `string}` — Version of the IM service.
+**Kind**: instance method of [<code>IMClient</code>](#IMClient)  
+**Returns**: <code>string</code> - : Version of the IM service.  
+<a name="IMClient+getInfrastructureList"></a>
 
-## `async getInfrastructureList()`
-
+### imClient.getInfrastructureList() ⇒ [<code>IMResponse</code>](#IMResponse)
 Get the list of Infrastructures.
 
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = array of IMInfrastructure in case of success.
+**Kind**: instance method of [<code>IMClient</code>](#IMClient)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = array of IMInfrastructure in case of success.  
+<a name="IMClient+createInfrastructure"></a>
 
-## `async createInfrastructure(template, type="radl")`
-
+### imClient.createInfrastructure(template:, type:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Create a new Infrastructure.
 
- * **Parameters:**
-   * `template:` — `string` — template body to create the new infrastructure.
-   * `type:` — `string` — Optional type of the template format (radl, tosca, yaml or json).
+**Kind**: instance method of [<code>IMClient</code>](#IMClient)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = IMInfrastructure in case of success.  
 
-     Default value: "radl".
+| Param | Type | Description |
+| --- | --- | --- |
+| template: | <code>string</code> | template body to create the new infrastructure. |
+| type: | <code>string</code> | Optional type of the template format (radl, tosca, yaml or json).                       Default value: "radl". |
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = IMInfrastructure in case of success.
+<a name="IMClient+importInfrastructure"></a>
 
-## `async importInfrastructure(data)`
-
+### imClient.importInfrastructure(data:) ⇒ [<code>IMResponse</code>](#IMResponse)
 Imports an Infrastructure (Using JSON data from Export operation).
 
- * **Parameters:** `data:` — `string` — String with the JSON data of the Infrastructure.
+**Kind**: instance method of [<code>IMClient</code>](#IMClient)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = IMInfrastructure in case of success.  
 
-     <p>
- * **Returns:** `IMResponse}` — Returns an IMResponse object with data = IMInfrastructure in case of success.
+| Param | Type | Description |
+| --- | --- | --- |
+| data: | <code>string</code> | String with the JSON data of the Infrastructure. |
+
+<a name="IMClient+getCloudInfo"></a>
+
+### imClient.getCloudInfo(cloud_id:, type:) ⇒ [<code>IMResponse</code>](#IMResponse)
+Get the quotas or images of a cloud provider
+
+**Kind**: instance method of [<code>IMClient</code>](#IMClient)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object with the quotas or images in case of success.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| cloud_id: | <code>string</code> | String with the ID of the cloud provider. |
+| type: | <code>string</code> | String with the type of info to retrieve (quotas or images). |
+
