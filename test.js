@@ -1,6 +1,6 @@
 var assert = require('assert');
 
-const {IMAuthDataItem, IMAuthData, IMClient, IMInfrastructure, IMVirtualMachine} = require('./im.js');
+const {IMAuthDataItem, IMAuthData, IMClient} = require('./im.js');
 
 var imAuth = new IMAuthDataItem("im", "InfrastructureManager", {"username": "userjs", "password": "passjs"})
 var oneAuth = new IMAuthDataItem("dummy", "Dummy", {})
@@ -148,7 +148,7 @@ describe('infGetOutputs()', function () {
     it('Get Outputs of an Inf.', async function () {
       const response = await inf.getOutputs();
       assert.ok(!response.ok);
-      assert.strictEqual(response.message, "Error Getting Inf. prop: (403, \"'outputs' infrastructure property is not valid in this infrastructure\")");
+      assert.strictEqual(response.message, "Error Getting Inf. prop: 403 Forbidden: 'outputs' infrastructure property is not valid in this infrastructure");
     });
 });
 
@@ -178,5 +178,16 @@ describe('infDestroy()', function () {
     it('Destroy Inf.', async function () {
       const response = await inf.destroy();
       assert.ok(response.ok);
+    });
+});
+
+describe('getCloudInfo()', function () {
+    it('Get the list of Infrastructures.', async function () {
+      const images = await im.getCloudInfo("dummy", "images");
+      assert.ok(images.ok);
+      assert.strictEqual(images.data.length, 2);
+      const quotas = await im.getCloudInfo("dummy", "quotas");
+      assert.ok(quotas.ok);
+      assert.strictEqual(quotas.data["cores"]["used"], 1);
     });
 });
