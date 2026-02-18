@@ -300,6 +300,12 @@ This class represents an Infrastructure Object.
     * [.reconfigure(template:, type:, vmList:)](#IMInfrastructure+reconfigure) ⇒ [<code>IMResponse</code>](#IMResponse)
     * [.export(del:)](#IMInfrastructure+export) ⇒ [<code>IMResponse</code>](#IMResponse)
     * [.getOutputs()](#IMInfrastructure+getOutputs) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getRADL()](#IMInfrastructure+getRADL) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getTOSCA()](#IMInfrastructure+getTOSCA) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getAuthorization()](#IMInfrastructure+getAuthorization) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.changeAuthorization(authData:, overwrite:)](#IMInfrastructure+changeAuthorization) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.start()](#IMInfrastructure+start) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.stop()](#IMInfrastructure+stop) ⇒ [<code>IMResponse</code>](#IMResponse)
 
 <a name="new_IMInfrastructure_new"></a>
 
@@ -396,6 +402,54 @@ It must have been created using a TOSCA template.
 
 **Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
 **Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object with JSON outputs in case of success.  
+<a name="IMInfrastructure+getRADL"></a>
+
+### imInfrastructure.getRADL() ⇒ [<code>IMResponse</code>](#IMResponse)
+Get the RADL used to create the Infrastructure.
+
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = RADL string in case of success.  
+<a name="IMInfrastructure+getTOSCA"></a>
+
+### imInfrastructure.getTOSCA() ⇒ [<code>IMResponse</code>](#IMResponse)
+Get the TOSCA representation of the Infrastructure.
+
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = TOSCA string in case of success.  
+<a name="IMInfrastructure+getAuthorization"></a>
+
+### imInfrastructure.getAuthorization() ⇒ [<code>IMResponse</code>](#IMResponse)
+Get the list of Infrastructure owners.
+
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = array of owner strings in case of success.  
+<a name="IMInfrastructure+changeAuthorization"></a>
+
+### imInfrastructure.changeAuthorization(authData:, overwrite:) ⇒ [<code>IMResponse</code>](#IMResponse)
+Change the authorization data of the Infrastructure.
+
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| authData: | <code>object</code> | Object with authorization data (username/password or token). |
+| overwrite: | <code>boolean</code> | Optional flag to overwrite or append authorization data.                             Default value "false". |
+
+<a name="IMInfrastructure+start"></a>
+
+### imInfrastructure.start() ⇒ [<code>IMResponse</code>](#IMResponse)
+Perform an start operation on all VMs in the Infrastructure.
+
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
+<a name="IMInfrastructure+stop"></a>
+
+### imInfrastructure.stop() ⇒ [<code>IMResponse</code>](#IMResponse)
+Perform a stop operation on all VMs in the Infrastructure.
+
+**Kind**: instance method of [<code>IMInfrastructure</code>](#IMInfrastructure)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = "" in case of success.  
 <a name="IMClient"></a>
 
 ## IMClient
@@ -409,10 +463,12 @@ See this links for more info about IM REST API:
 * [IMClient](#IMClient)
     * [new IMClient(imUrl:, authData:)](#new_IMClient_new)
     * [.getVersion()](#IMClient+getVersion) ⇒ <code>string</code>
+    * [.getStats(init_date:, end_date:)](#IMClient+getStats) ⇒ [<code>IMResponse</code>](#IMResponse)
     * [.getInfrastructureList()](#IMClient+getInfrastructureList) ⇒ [<code>IMResponse</code>](#IMResponse)
     * [.createInfrastructure(template:, type:)](#IMClient+createInfrastructure) ⇒ [<code>IMResponse</code>](#IMResponse)
     * [.importInfrastructure(data:)](#IMClient+importInfrastructure) ⇒ [<code>IMResponse</code>](#IMResponse)
-    * [.getCloudInfo(cloud_id:, type:)](#IMClient+getCloudInfo) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getCloudQuotas(cloud_id:)](#IMClient+getCloudQuotas) ⇒ [<code>IMResponse</code>](#IMResponse)
+    * [.getCloudImages(cloud_id:, filters:)](#IMClient+getCloudImages) ⇒ [<code>IMResponse</code>](#IMResponse)
 
 <a name="new_IMClient_new"></a>
 
@@ -432,6 +488,19 @@ Gets IM service version.
 
 **Kind**: instance method of [<code>IMClient</code>](#IMClient)  
 **Returns**: <code>string</code> - : Version of the IM service.  
+<a name="IMClient+getStats"></a>
+
+### imClient.getStats(init_date:, end_date:) ⇒ [<code>IMResponse</code>](#IMResponse)
+Get IM service stats.
+
+**Kind**: instance method of [<code>IMClient</code>](#IMClient)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = stats in case of success.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| init_date: | <code>string</code> | Optional init date in format YYYY/MM/dd. |
+| end_date: | <code>string</code> | Optional end date in format YYYY/MM/dd. |
+
 <a name="IMClient+getInfrastructureList"></a>
 
 ### imClient.getInfrastructureList() ⇒ [<code>IMResponse</code>](#IMResponse)
@@ -464,16 +533,28 @@ Imports an Infrastructure (Using JSON data from Export operation).
 | --- | --- | --- |
 | data: | <code>string</code> | String with the JSON data of the Infrastructure. |
 
-<a name="IMClient+getCloudInfo"></a>
+<a name="IMClient+getCloudQuotas"></a>
 
-### imClient.getCloudInfo(cloud_id:, type:) ⇒ [<code>IMResponse</code>](#IMResponse)
-Get the quotas or images of a cloud provider
+### imClient.getCloudQuotas(cloud_id:) ⇒ [<code>IMResponse</code>](#IMResponse)
+Get the quotas of a cloud provider
 
 **Kind**: instance method of [<code>IMClient</code>](#IMClient)  
-**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object with the quotas or images in case of success.  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = Object with the quotas in case of success.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | cloud_id: | <code>string</code> | String with the ID of the cloud provider. |
-| type: | <code>string</code> | String with the type of info to retrieve (quotas or images). |
+
+<a name="IMClient+getCloudImages"></a>
+
+### imClient.getCloudImages(cloud_id:, filters:) ⇒ [<code>IMResponse</code>](#IMResponse)
+Get available images in a cloud provider.
+
+**Kind**: instance method of [<code>IMClient</code>](#IMClient)  
+**Returns**: [<code>IMResponse</code>](#IMResponse) - : Returns an IMResponse object with data = array of images in case of success.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| cloud_id: | <code>string</code> | String with the ID of the cloud provider. |
+| filters: | <code>string</code> | Optional filters parameter (cloud provider specific). |
 
