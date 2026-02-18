@@ -136,7 +136,6 @@ describe('vmDestroy()', function () {
     });
 });
 
-
 describe('infReconfigure()', function () {
     it('Reconfigure Inf.', async function () {
       const response = await inf.reconfigure("");
@@ -149,6 +148,29 @@ describe('infGetOutputs()', function () {
       const response = await inf.getOutputs();
       assert.ok(!response.ok);
       assert.strictEqual(response.message, "Error Getting Inf. prop: 403 Forbidden: 'outputs' infrastructure property is not valid in this infrastructure");
+    });
+});
+
+describe('infGetRADL()', function () {
+    it('Get RADL of an Inf.', async function () {
+      const response = await inf.getRADL();
+      assert.ok(response.ok);
+      assert.ok(response.data.length > 0);
+    });
+});
+
+describe('infGetTOSCA()', function () {
+    it('Get TOSCA of an Inf.', async function () {
+      const response = await inf.getTOSCA();
+      assert.ok(!response.ok);
+    });
+});
+
+describe('infGetAuthorization()', function () {
+    it('Get Authorization of an Inf.', async function () {
+      const response = await inf.getAuthorization();
+      assert.ok(response.ok);
+      assert.ok(response.data.length > 0);
     });
 });
 
@@ -181,13 +203,25 @@ describe('infDestroy()', function () {
     });
 });
 
-describe('getCloudInfo()', function () {
+describe('getCloudQuotas()', function () {
     it('Get the list of Infrastructures.', async function () {
-      const images = await im.getCloudInfo("dummy", "images");
-      assert.ok(images.ok);
-      assert.strictEqual(images.data.length, 2);
-      const quotas = await im.getCloudInfo("dummy", "quotas");
+      const quotas = await im.getCloudQuotas("dummy");
       assert.ok(quotas.ok);
       assert.strictEqual(quotas.data["cores"]["used"], 1);
+    });
+});
+
+describe('getStats()', function () {
+    it('Get IM stats.', async function () {
+      const response = await im.getStats();
+      assert.ok(response.ok);
+    });
+});
+
+describe('getCloudImages()', function () {
+    it('Get cloud images.', async function () {
+      const response = await im.getCloudImages("dummy");
+      assert.ok(response.ok);
+      assert.strictEqual(response.data.length, 2);
     });
 });

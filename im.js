@@ -588,6 +588,108 @@ class IMInfrastructure extends IMCloudResource {
   async getOutputs() {
     return this.getProperty("outputs")
   }
+
+  /**
+    * Get the RADL used to create the Infrastructure.
+    * 
+    * @return {IMResponse}: Returns an IMResponse object with data = RADL string in case of success.
+    */
+  async getRADL() {
+    return this.getProperty("radl")
+  }
+
+  /**
+    * Get the TOSCA representation of the Infrastructure.
+    * 
+    * @return {IMResponse}: Returns an IMResponse object with data = TOSCA string in case of success.
+    */
+  async getTOSCA() {
+    return this.getProperty("tosca")
+  }
+
+  /**
+    * Get the list of Infrastructure owners.
+    * 
+    * @return {IMResponse}: Returns an IMResponse object with data = array of owner strings in case of success.
+    */
+  async getAuthorization() {
+    return this.getProperty("authorization")
+  }
+
+  /**
+    * Change the authorization data of the Infrastructure.
+    *
+    * @param {object} authData: Object with authorization data (username/password or token).
+    * @param {boolean} overwrite: Optional flag to overwrite or append authorization data.
+    *                             Default value "false".
+    * 
+    * @return {IMResponse}: Returns an IMResponse object with data = "" in case of success.
+    */
+  async changeAuthorization(authData, overwrite=false) {
+    const headers = {'Accept': 'application/json',
+                     'Authorization': this.client.authData.formatAuthData(),
+                     'Content-Type': 'application/json'};
+    var url = this.fullid + "/authorization";
+    if (overwrite) {
+      url = url + "?overwrite=true";
+    }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(authData)
+    })
+    if (response.ok) {
+      const output = await response.text();
+      return new IMResponse(true, output, null);
+    } else {
+      const output = await response.json();
+      return new IMResponse(false, null, output['message']);
+    }
+  }
+
+  /**
+    * Perform an start operation on all VMs in the Infrastructure.
+    *  
+    * @return {IMResponse}: Returns an IMResponse object with data = "" in case of success.
+    */
+  async start() {
+    const headers = {'Accept': 'application/json',
+                     'Authorization': this.client.authData.formatAuthData()};
+    const url = this.fullid + "/start";
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: headers
+    })
+    if (response.ok) {
+      const output = await response.text();
+      return new IMResponse(true, output, null);
+    } else {
+      const output = await response.json();
+      return new IMResponse(false, null, output['message']);
+    }
+  }
+
+  /**
+    * Perform a stop operation on all VMs in the Infrastructure.
+    *  
+    * @return {IMResponse}: Returns an IMResponse object with data = "" in case of success.
+    */
+  async stop() {
+    const headers = {'Accept': 'application/json',
+                     'Authorization': this.client.authData.formatAuthData()};
+    const url = this.fullid + "/stop";
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: headers
+    })
+    if (response.ok) {
+      const output = await response.text();
+      return new IMResponse(true, output, null);
+    } else {
+      const output = await response.json();
+      return new IMResponse(false, null, output['message']);
+    }
+  }
 }
 
 
@@ -618,6 +720,38 @@ class IMClient {
     async getVersion() {
         const response = await fetch(this.imUrl + '/version');
         return await response.text();
+    }
+
+    /**
+      * Get IM service stats.
+      * 
+      * @param {string} init_date: Optional init date in format YYYY/MM/dd.
+      * @param {string} end_date: Optional end date in format YYYY/MM/dd.
+      *
+      * @return {IMResponse}: Returns an IMResponse object with data = stats in case of success.
+      */
+    async getStats(init_date="", end_date="") {
+    const headers = {'Accept': 'application/json',
+                     'Authorization': this.authData.formatAuthData()};
+      var url = this.imUrl + '/stats';
+      var params = [];
+      if (init_date != "") {
+        params.push("init_date=" + init_date);
+      }
+      if (end_date != "") {
+        params.push("end_date=" + end_date);
+      }
+      if (params.length > 0) {
+        url = url + "?" + params.join("&");
+      }
+      const response = await fetch(url, {headers: headers});
+      if (response.ok) {
+        const output = await response.json();
+        return new IMResponse(true, output, null);
+      } else {
+        const output = await response.json();
+        return new IMResponse(false, null, output['message']);
+      }
     }
 
   /**
@@ -707,21 +841,44 @@ class IMClient {
     }
 
   /**
-    * Get the quotas or images of a cloud provider
+    * Get the quotas of a cloud provider
     * 
     * @param {string} cloud_id: String with the ID of the cloud provider.
-    * @param {string} type: String with the type of info to retrieve (quotas or images).
     * 
-    * @return {IMResponse}: Returns an IMResponse object with data = Object with the quotas or images in case of success.
+    * @return {IMResponse}: Returns an IMResponse object with data = Object with the quotas in case of success.
     */
-    async getCloudInfo(cloud_id, type) {
+    async getCloudQuotas(cloud_id) {
       const headers = {'Accept': 'application/json',
                        'Authorization': this.authData.formatAuthData()};
-      const url = this.imUrl + '/clouds/' + cloud_id + '/' + type;
+      const url = this.imUrl + '/clouds/' + cloud_id + '/quotas';
       const response = await fetch(url, {headers: headers});
       const output = await response.json();
       if (response.ok) {
-        return new IMResponse(true, output[type], null);
+        return new IMResponse(true, output['quotas'], null);
+      } else {
+        return new IMResponse(false, null, output['message']);
+      }
+    }
+
+  /**
+    * Get available images in a cloud provider.
+    * 
+    * @param {string} cloud_id: String with the ID of the cloud provider.
+    * @param {string} filters: Optional filters parameter (cloud provider specific).
+    * 
+    * @return {IMResponse}: Returns an IMResponse object with data = array of images in case of success.
+    */
+    async getCloudImages(cloud_id, filters="") {
+      var url = this.imUrl + '/clouds/' + cloud_id + '/images';
+      if (filters != "") {
+        url = url + "?filters=" + encodeURIComponent(filters);
+      }
+      const headers = {'Accept': 'application/json',
+                       'Authorization': this.authData.formatAuthData()};
+      const response = await fetch(url, {headers: headers});
+      const output = await response.json();
+      if (response.ok) {
+        return new IMResponse(true, output['images'], null);
       } else {
         return new IMResponse(false, null, output['message']);
       }
